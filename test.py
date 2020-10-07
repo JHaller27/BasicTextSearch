@@ -4,17 +4,23 @@ from textSearch import *
 searcher = TextSearcher()
 method = PrioritySearch()
 
-searcher.add("Hello world")
-searcher.add("Hello, space")
-searcher.add("Good bye, world")
-searcher.add("Good bye space")
-searcher.add("Bye y'all")
-searcher.add("Howdy, y'all")
+with open('data/grimms_tales.txt', 'r') as fin:
+    text = fin.read()
+    text = text.replace('\n', ' ')
+    for sentence in text.split('.'):
+        searcher.add(sentence)
 
 # print(searcher)
 
-terms = ["Hello", "spaCe"]
+terms = ["house", "the", "and", "good"]
 print("Searching with [", " + ".join(terms), "] and", str(method))
 found = searcher.search(terms, method)
 
-print(list(found))
+count = 0
+for x in found:
+    count += 1
+
+    print(x)
+    print("=" * 60)
+
+print(f"{count=}")
