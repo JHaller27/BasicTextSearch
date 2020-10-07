@@ -104,10 +104,12 @@ class PrioritySearch(SearchMethod):
 
 
 class TextSearcher:
-    def __init__(self):
+    def __init__(self, default_method: SearchMethod = None):
         self._next_id = 0
         self._word_map = {}
         self._text_map = {}
+
+        self._default_method = default_method
 
 
     def __len__(self) -> int:
@@ -115,7 +117,7 @@ class TextSearcher:
 
 
     def __repr__(self) -> str:
-        return f"<TextSearcher len={len(self)}>"
+        return f"<TextSearcher len={len(self)} search_methd={repr(self._default_method)}>"
 
 
     def __str__(self) -> str:
@@ -137,7 +139,9 @@ class TextSearcher:
             word = word.lower()
             self._link_word_to_text(word, self._next_id)
 
-    def search(self, terms, method: SearchMethod):
+    def search(self, terms, method: SearchMethod = None):
+        method = self._get_method(method)
+
         text_ids = method.search(self._word_map, terms)
 
         return map(lambda tid: self._text_map[tid], text_ids)
@@ -146,3 +150,12 @@ class TextSearcher:
         if word not in self._word_map:
             self._word_map[word] = set()
         self._word_map[word].add(text_id)
+
+    def _get_method(self, method_override: SearchMethod):
+        if method_override is None:
+            if self._default_method is None:
+                raise ValueError("Must either define a default SearchMethod in the constructor, or pass as a parameter for one-time use")
+
+            return self._default_method
+
+        return method_override
